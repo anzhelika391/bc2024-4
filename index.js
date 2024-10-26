@@ -1,31 +1,33 @@
-// index.js
-const http = require('http'); // Імпортуємо модуль http
-const { Command } = require('commander'); // Імпортуємо модуль commander
-const program = new Command(); // Створюємо екземпляр Commander
+const http = require('http');
+const { Command } = require('commander');
 
-// Визначаємо аргументи командного рядка
+const program = new Command();
+
 program
-  .requiredOption('-h, --host <host>', 'адреса сервера') // Обовʼязковий параметр для адреси сервера
-  .requiredOption('-p, --port <port>', 'порт сервера') // Обовʼязковий параметр для порту
-  .requiredOption('-c, --cache <directory>', 'шлях до директорії, яка міститиме закешовані файли'); // Обовʼязковий параметр для шляху до кешу
+  .requiredOption('-h, --host <host>', 'адреса сервера')
+  .requiredOption('-p, --port <port>', 'порт сервера')
+  .requiredOption('-c, --cache <directory>', 'шлях до директорії, яка міститиме закешовані файли');
 
-program.parse(process.argv); // Парсимо аргументи командного рядка
+program.parse(process.argv);
 
-const options = program.opts(); // Отримуємо значення опцій
+const options = program.opts();
 
-// Виводимо інформацію про сервер
+// Перевірка обов'язкових параметрів
+if (!options.host || !options.port || !options.cache) {
+  console.error('Помилка: Всі параметри -h (host), -p (port) та -c (cache) є обовʼязковими.');
+  process.exit(1); // Завершення програми з кодом помилки 1
+}
+
 console.log(`Адреса сервера: ${options.host}`);
 console.log(`Порт сервера: ${options.port}`);
 console.log(`Шлях до директорії кешу: ${options.cache}`);
 
-// Створюємо веб-сервер
+// Запуск сервера
 const server = http.createServer((req, res) => {
-  res.statusCode = 200; // Встановлюємо статус 200 (OK)
-  res.setHeader('Content-Type', 'text/plain'); // Встановлюємо заголовок Content-Type
-  res.end('Веб-сервер працює!\n'); // Відправляємо відповідь
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Hello, world!\n');
 });
 
-// Запускаємо сервер
 server.listen(options.port, options.host, () => {
-  console.log(`Сервер запущено на http://${options.host}:${options.port}`); // Інформуємо про запуск сервера
+  console.log(`Сервер запущено на http://${options.host}:${options.port}`);
 });
